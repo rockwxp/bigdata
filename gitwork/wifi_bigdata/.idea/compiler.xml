@@ -6,7 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="wifi_bigdata" />
+        <module name="wifi_bigdata_common" />
+        <module name="wifi_bigdata_flume" />
+        <module name="wifi_bigdata_kafka" />
+        <module name="wifi_bigdata_resources" />
       </profile>
     </annotationProcessing>
   </component>
