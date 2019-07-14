@@ -10,7 +10,7 @@
   <version>1.0-SNAPSHOT</version>
   <modules>
     <module>wifi_bigdata_common</module>
-      <module>wifi_bigdata_resources</module>
+    <module>wifi_bigdata_resources</module>
     <module>wifi_bigdata_flume</module>
     <module>wifi_bigdata_kafka</module>
   </modules>
