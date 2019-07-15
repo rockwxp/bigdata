@@ -13,6 +13,7 @@
     <module>wifi_bigdata_resources</module>
     <module>wifi_bigdata_flume</module>
     <module>wifi_bigdata_kafka</module>
+      <module>wifi_bigdata_spark</module>
   </modules>
 
   <name>wifi_bigdata</name>

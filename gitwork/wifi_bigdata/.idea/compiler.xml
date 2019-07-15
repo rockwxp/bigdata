@@ -10,6 +10,7 @@
         <module name="wifi_bigdata_flume" />
         <module name="wifi_bigdata_kafka" />
         <module name="wifi_bigdata_resources" />
+        <module name="wifi_bigdata_spark" />
       </profile>
     </annotationProcessing>
   </component>
