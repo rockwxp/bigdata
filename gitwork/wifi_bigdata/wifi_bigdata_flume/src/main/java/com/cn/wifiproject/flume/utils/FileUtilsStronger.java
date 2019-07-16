@@ -18,17 +18,24 @@ public class FileUtilsStronger {
     private static final Logger logger = Logger.getLogger(FileUtilsStronger.class);
 
     /**
-     *
-     * @param file
-     * @param path
+     * @Description: 获取文件每一行数据，讲成功的数据移动到新的地址
+     * @param: [file 文件类
+     *          path 文件存储地址
+     *          ]
+     * @return: 存储处理成功文件的目录地址，文件数据的内容，
+     * @auther: Rock
+     * @date: 2019-07-16 14:00
      */
     public static Map<String,Object> parseFile(File file, String path) {
 
         Map<String,Object> map=new HashMap<String,Object>();
         List<String> lines;
+
+        //构建新地址
         String fileNew = path+ TimeTranstationUtils.Date2yyyy_MM_dd()+getDir(file);
 
         try {
+            //判断文件地址是否存在
             if((new File(fileNew+file.getName())).exists()){
                 try{
                     logger.info("文件名已经存在，开始删除同名已经存在文件"+file.getAbsolutePath());
@@ -38,13 +45,16 @@ public class FileUtilsStronger {
                     logger.error("删除同名已经存在文件"+file.getAbsolutePath()+"失败",e);
                 }
             }else{
+                //获取文件每一行数据
                 lines = FileUtils.readLines(file);
+                //将新文件地址，和文件数据 存入Map 返回
                 map.put(MapFields.ABSOLUTE_FILENAME,fileNew+file.getName());
                 map.put(MapFields.VALUE,lines);
                 FileUtils.moveToDirectory(file, new File(fileNew), true);
                 logger.info("移动文件到"+file.getAbsolutePath()+"到"+fileNew+"成功");
             }
         } catch (Exception e) {
+            //TODO 处理文件失败，可保存失败文件目录
             logger.error("移动文件" + file.getAbsolutePath() + "到" + fileNew + "失败", e);
         }
 

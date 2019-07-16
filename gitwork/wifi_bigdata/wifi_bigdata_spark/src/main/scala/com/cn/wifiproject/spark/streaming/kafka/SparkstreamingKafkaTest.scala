@@ -4,6 +4,7 @@ import com.cn.wifiproject.spark.common.SparkConfFactory
 import kafka.serializer.StringDecoder
 import org.apache.spark.Logging
 import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils}
+import org.apache.spark.streaming.kafka.KafkaCluster
 
 /**
   * description:

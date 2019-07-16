@@ -4,6 +4,7 @@ package com.cn.wifiproject.flume.source;
 import com.cn.wifiproject.flume.constant.FlumeConfConstant;
 import com.cn.wifiproject.flume.fields.MapFields;
 import com.cn.wifiproject.flume.utils.FileUtilsStronger;
+import com.sun.xml.internal.bind.v2.TODO;
 import org.apache.commons.io.FileUtils;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
@@ -76,30 +77,44 @@ public class FolderSource extends AbstractSource implements Configurable, Pollab
 
         Status status = null;
         try {
+
+            //TODO 获取文件
+
             // for (String dir : dirs) {
             logger.info("dirStr===========" + dirStr);
+            //获取文件
             allFiles = FileUtils.listFiles(new File(dirStr), new String[]{"txt", "bcp"}, true);
+            //判断文件数量，为了控制文件的处理数量
             if (allFiles.size() >= filenum) {
+                //如果文件数据量大于设定值，就保存设定值数量的文件
                 listFiles = ((List<File>) allFiles).subList(0, filenum);
             } else {
+                //如果小于，则就保存所有的文件
                 listFiles = ((List<File>) allFiles);
             }
 
+            //TODO 遍历和解析文件 把数据封装成event
             if (listFiles.size() > 0) {
                 for (File file : listFiles) {
                     String fileName = file.getName();
+                    //获取新的文件地址，和文件数据
                     Map<String, Object> stringObjectMap = FileUtilsStronger.parseFile(file, successfile);
                     String absoluteFilename = (String) stringObjectMap.get(MapFields.ABSOLUTE_FILENAME);
                     List<String> lines = (List<String>) stringObjectMap.get(MapFields.VALUE);
 
                     if (lines != null && lines.size() > 0) {
 
+                        //遍历数据内容
                         for (String line : lines) {
+                            //将文件名和绝对路径存入Map 封装成EventHeader
                             Map<String, String> map = new HashMap<String, String>();
                             map.put(MapFields.FILENAME, fileName);
                             map.put(MapFields.ABSOLUTE_FILENAME, absoluteFilename);
+                            //新建Event
                             SimpleEvent event = new SimpleEvent();
+                            //转换数据内容类型到byte，作为eventbody
                             byte[] bytes = line.getBytes();
+                            //保存数据
                             event.setBody(bytes);
                             event.setHeaders(map);
                             eventList.add(event);
@@ -108,7 +123,9 @@ public class FolderSource extends AbstractSource implements Configurable, Pollab
 
                     try {
                         if (eventList.size() > 0) {
+                            //获取ChannelProcessor
                             ChannelProcessor channelProcessor = getChannelProcessor();
+                            //将eventList 传给channel。传送过程中可以被拦截器拦截
                             channelProcessor.processEventBatch(eventList);
                             logger.info("批量推送到 拦截器 数据大小为" + eventList.size());
                         }
