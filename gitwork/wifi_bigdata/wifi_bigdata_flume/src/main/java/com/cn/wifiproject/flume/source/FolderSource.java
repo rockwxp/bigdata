@@ -4,7 +4,6 @@ package com.cn.wifiproject.flume.source;
 import com.cn.wifiproject.flume.constant.FlumeConfConstant;
 import com.cn.wifiproject.flume.fields.MapFields;
 import com.cn.wifiproject.flume.utils.FileUtilsStronger;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.apache.commons.io.FileUtils;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
@@ -67,6 +66,13 @@ public class FolderSource extends AbstractSource implements Configurable, Pollab
         }
     }
 
+    /**
+     * @Description: 核心 定义Source自己的处理逻辑
+     * @param: []
+     * @return: org.apache.flume.PollableSource.Status
+     * @auther: Rock
+     * @date: 2019-07-18 13:38
+     */
     @Override
     public Status process() {
         try {

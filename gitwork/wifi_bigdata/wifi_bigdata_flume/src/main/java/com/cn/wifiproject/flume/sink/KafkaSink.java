@@ -23,6 +23,7 @@ public class KafkaSink extends AbstractSink implements Configurable {
 	@Override
 	public void configure(Context context) {
 		kafkatopics = context.getString("kafkatopics").split(",");
+		logger.info("获取kafka topic配置" + context.getString("kafkatopics"));
 		listKeyedMessage=new ArrayList<>();
 	}
 
@@ -43,7 +44,10 @@ public class KafkaSink extends AbstractSink implements Configurable {
 			String recourd = new String(event.getBody());
 			// 发送数据到kafka
 			try {
+
+				logger.info("发送到kafka的数据： topic："+kafkatopics[0]+" event.body:"+recourd);
 				StringProducer.producer(kafkatopics[0],recourd);
+
 			/*	if(listKeyedMessage.size()>1000){
 					logger.info("数据大与10000,推送数据到kafka");
 					sendListKeyedMessage();

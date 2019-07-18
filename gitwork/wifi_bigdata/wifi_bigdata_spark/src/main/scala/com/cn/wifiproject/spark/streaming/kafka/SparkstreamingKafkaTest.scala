@@ -19,9 +19,7 @@ object SparkstreamingKafkaTest extends Serializable with Logging{
 
 
     //获取streamingContext参数
-    val ssc = SparkConfFactory.newSparkLocalStreamingContext("SparkstreamingKafkaTest",
-                                                              10L,
-                                                             1)
+    val ssc = SparkConfFactory.newSparkLocalStreamingContext("SparkstreamingKafkaTest", 30L, 1)
 
     //获取kafka配置信息
     val kafkaParams = getKafkaParam(topic,"consumer")
