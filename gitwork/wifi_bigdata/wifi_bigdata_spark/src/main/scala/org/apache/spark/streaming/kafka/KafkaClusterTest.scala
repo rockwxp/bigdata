@@ -11,9 +11,9 @@ import org.apache.spark.Logging
 object KafkaClusterTest extends Serializable with Logging {
 
 
-  val topic = "ch1_test2";
+  val topic = "chl_test8";
 
-  val kafkaParams = getKafkaParam(topic, "consumer2")
+  val kafkaParams = getKafkaParam(topic, "consumer12")
 
   //获取kafkaCluster @transient防止并发
   @transient
@@ -29,7 +29,7 @@ object KafkaClusterTest extends Serializable with Logging {
 
   def main(args: Array[String]): Unit = {
     //获取消费者组名
-    val groupId = "consumer";
+    val groupId = "console-consumer-93603";
     //获取kafka本身的偏移量
     val partitionE = kc.getPartitions(Set(topic))
     require(partitionE.isRight,s"获取Partition失败")
@@ -54,11 +54,11 @@ object KafkaClusterTest extends Serializable with Logging {
     latestLeaderOffset.foreach(println(_))
    
     //获取消费者的offsets
-    val consumerOffsetsE = kc.getConsumerOffsets(groupId,partitions)
+   /* val consumerOffsetsE = kc.getConsumerOffsets(groupId,partitions)
     require(consumerOffsetsE.isRight,s"获取consumerOffsets失败")
     val consumerOffsets = consumerOffsetsE.right.get
     println("consumer偏移信息")
-    consumerOffsets.foreach(println(_))
+    consumerOffsets.foreach(println(_))*/
 
 
   }

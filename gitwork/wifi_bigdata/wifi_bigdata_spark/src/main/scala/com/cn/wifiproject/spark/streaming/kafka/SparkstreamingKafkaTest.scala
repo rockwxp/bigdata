@@ -4,7 +4,7 @@ import com.cn.wifiproject.spark.common.SparkConfFactory
 import kafka.serializer.StringDecoder
 import org.apache.spark.Logging
 import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils}
-import org.apache.spark.streaming.kafka.KafkaCluster
+
 
 /**
   * description:
@@ -13,20 +13,18 @@ import org.apache.spark.streaming.kafka.KafkaCluster
   **/
 object SparkstreamingKafkaTest extends Serializable with Logging{
 
-  val topic = "ch1_test1"
-
+  val topic = "chl_test11"
   def main(args: Array[String]): Unit = {
 
-
     //获取streamingContext参数
-    val ssc = SparkConfFactory.newSparkLocalStreamingContext("SparkstreamingKafkaTest", 30L, 1)
-
+    val ssc = SparkConfFactory.newSparkLocalStreamingContext("SparkstreamingKafkaTest",
+      10L,
+      1)
     //获取kafka配置信息
-    val kafkaParams = getKafkaParam(topic,"consumer")
-
+    val kafkaParams = getKafkaParam(topic,"consumer2")
     //从kafka中获取DS流
     val kafkaDS = KafkaUtils.createDirectStream[String,String,StringDecoder,StringDecoder](ssc,kafkaParams,Set(topic))
-
+    //(null,{"rksj":"1558178497","latitude":"24.000000","imsi":"000000000000000"})
     kafkaDS.foreachRDD(rdd=>{
       //获取rdd中保存的 kafka offsets信息
       val offsetsList = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
@@ -42,15 +40,12 @@ object SparkstreamingKafkaTest extends Serializable with Logging{
     ssc.awaitTermination()
   }
 
-
-
   /**
-   * @Description: 获取kafka配置信息
-   * @param: [kafkaTopic, groupId]
-   * @return: scala.collection.immutable.Map<java.lang.String,java.lang.String>
-   * @auther: Rock
-   * @date: 2019-07-15 14:14
-   */
+    * 获取kafkaParams
+    * @param kafkaTopic
+    * @param groupId
+    * @return
+    */
   def getKafkaParam(kafkaTopic:String,groupId : String): Map[String,String]={
     val kafkaParam=Map[String,String](
       "metadata.broker.list" -> "hadoop-4:9092",
