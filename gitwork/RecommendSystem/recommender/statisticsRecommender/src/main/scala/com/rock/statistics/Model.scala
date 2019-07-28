@@ -1,4 +1,4 @@
-package com.rock.test
+package com.rock.statistics
 
 /**
   * description:
@@ -75,3 +75,12 @@ case class MongoConfig(val uri:String,val db:String)
   */
 case class ESConfig(val httpHosts:String,val transportHosts:String,val index:String,val clusterName:String)
 
+/**
+ * 电影评分推荐（电影ID，平均分）
+ */
+case class Recommendation(mid: Int, r: Double)
+
+/**
+  * 电影类型推荐（电影类型，电影评分）
+  */
+case class GenresRecommendation(genres: String, recs: Seq[Recommendation])

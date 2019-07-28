@@ -1,10 +1,4 @@
-package com.rock.test
-
-/**
-  * description:
-  * author: Rock
-  * create: 2019-07-23 12:52
-  **/
+package com.rock
 
 /**
   * 解释数据：
@@ -51,7 +45,7 @@ case class Movie(val mid:Int,val name:String,val descri:String,val timelong:Stri
   * 用户对电影的评分
   * 用户对电影评分的时间
   */
-case class Rating(val uid:Int,val mid:Int,val score: Double,val timestamp:Int)
+case class MovieRating(val uid:Int,val mid:Int,val score: Double,val timestamp:Int)
 
 /**
   * tags.csv
@@ -75,3 +69,9 @@ case class MongoConfig(val uri:String,val db:String)
   */
 case class ESConfig(val httpHosts:String,val transportHosts:String,val index:String,val clusterName:String)
 
+case class Recommendation(mid: Int, r: Double)
+
+case class GenresRecommendation(genres: String, recs: Seq[Recommendation])
+
+// 用户的推荐
+case class UserRecs(uid:Int, recs:Seq[Recommendation])
