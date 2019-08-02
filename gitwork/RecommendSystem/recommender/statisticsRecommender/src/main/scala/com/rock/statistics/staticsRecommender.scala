@@ -18,6 +18,13 @@ object staticsRecommender {
   val AVERAGE_MOVIES_SCORE = "AverageMoviesScore"
   val GENRES_TOP_MOVIES = "GenresTopMovies"
 
+  /**排序热门电影，
+   * @Description:
+   * @param: [spark, mongoConfig]
+   * @return: scala.Function1<com.rock.statistics.MongoConfig,scala.runtime.BoxedUnit>
+   * @auther: Rock
+   * @date: 2019-08-02 12:43
+   */
   def rateMore(spark:SparkSession)(implicit mongoConfig:MongoConfig): Unit ={
     //以MovieID分组，用评分次数排序，从大到小排序，
     val rateMoreDF= spark.sql("select mid,count(1) as count from ratings group by mid order by count desc")
@@ -87,16 +94,16 @@ object staticsRecommender {
     //根据电影类别RDD开始分类
     //笛卡尔积操作cartesian，将每个电影类别和moviesWithScoreDF每条 相乘
     val genresTopMovies =genresRDD.cartesian(moviesWithScoreDF.rdd).filter{
-      case (genres,row) => {
+      case (genres,movies) => {
         //filter 拦截过滤数据，将row(moviesWithScoreDF)中的电影类别中没和genres(genresRDD)的数据去除
-        row.getAs[String]("genres").toLowerCase.contains(genres.toLowerCase)
+        movies.getAs[String]("genres").toLowerCase.contains(genres.toLowerCase)
       }
     }.map{
-      case (genres,row) =>{
+      case (genres,movies) =>{
         //只保留row(moviesWithScoreDF)中的电影ID 和 平均分数
-        (genres,(row.getAs[Int]("mid"),row.getAs[Double]("avg")))
+        (genres,(movies.getAs[Int]("mid"),movies.getAs[Double]("avg")))
       }
-    }.groupByKey()//分组，根据上一层处理返回的数据中第一个值genres 进行分组，对应每一个电影类型是电影的数据集合（电影ID 和 平均分数）
+    }.groupByKey()//分组，根据上一层处理返回的数据中第一个值genres为Key 进行分组，对应每一个电影类型是电影的数据集合（电影ID 和 平均分数）
       .map{
         case (genres,items)=>{
           //封装数据到对象中，并且把items中电影数据集合转成List，根据评分保留前十到数据，然后倒叙排列

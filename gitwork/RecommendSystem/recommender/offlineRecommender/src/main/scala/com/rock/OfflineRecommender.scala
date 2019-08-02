@@ -3,6 +3,7 @@ package com.rock
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.recommendation.{ALS, Rating}
 import org.apache.spark.sql.SparkSession
+import org.jblas.DoubleMatrix
 
 
 /**
@@ -19,7 +20,7 @@ object OfflineRecommender {
 
   val MONGODB_USER_RECS="UserRecs"
   val USER_MAX_RECOMMENDATION=10
-
+  val MONGO_MOVIE_RECS="MovieRecs"
 
   def main(args: Array[String]): Unit = {
 
@@ -76,7 +77,7 @@ object OfflineRecommender {
       * 0.01
       *
       */
-    //把训练数据导入spark.mllib中导Rating对象中
+    //把训练数据(用ID，电影ID，评分)导入spark.mllib中导Rating对象中
     val trainData = ratingRdd.map(x => Rating(x._1,x._2,x._3))
 
     val (rank,iterations,lambda) = (50,5,0.01)
@@ -93,7 +94,7 @@ object OfflineRecommender {
     //把数据放入模型生成预测结果
     val preRating = model.predict(userMovie)
 
-    //开始整理预测结果
+    //开始整理预测结果，存数据库
     val userRecs =preRating
       .filter(_.rating >0 )
       .map(rating => (rating.user,(rating.product,rating.rating)))
@@ -111,6 +112,42 @@ object OfflineRecommender {
       .format("com.mongodb.spark.sql")
       .save()
 
+
+    //获取电影相似度的特征矩阵
+    val movieFeatures = model.productFeatures.map{
+      case (mid,features) =>(mid,new DoubleMatrix(features))
+    }
+    //笛卡尔积，每个电影之间建立相似度的比较
+    val movieRecs = movieFeatures.cartesian(movieFeatures)
+       //过滤同一个电影ID之间的比较
+        .filter{
+          case (a,b) => (a._1 != b._1)
+        }
+        .map{
+          case (a,b) =>{
+            //求两个值之间的余弦相似度
+            val simScore = consinSim(a._2,b._2)
+            //拼接结果（m1ID，（m2ID，相似度））
+            (a._1,(b._1,simScore))
+          }
+        }
+        .filter(_._2._2 >0.6)
+        .groupByKey()
+        .map{
+          case (mid,items) =>{
+            MovieRecs(mid,items.toList.map(x=>Recommendation(x._1,x._2)))
+          }
+        }toDF
+
+    movieRecs.write
+        .option("uri",mongoConfig.uri)
+        .option("collection",MONGO_MOVIE_RECS)
+        .mode("overwrite")
+        .format("com.mongodb.spark.sql")
+        .save()
+
+
+
     ratingRdd.unpersist()
     movieRdd.unpersist()
     uIDRdd.unpersist()
@@ -118,6 +155,19 @@ object OfflineRecommender {
 
 
 
+  }
+
+
+  /**
+   * @Description: 求两个值之间的余弦相似度
+   * @param: [movie1, movie2]
+   * @return: double
+   * @auther: Rock
+   * @date: 2019-07-29 10:52
+   */
+  def consinSim(movie1:DoubleMatrix,movie2:DoubleMatrix):Double ={
+    //ab/(a^2 * b^2)
+    movie1.dot(movie2)/(movie1.norm2()*movie2.norm2())
   }
 
 }

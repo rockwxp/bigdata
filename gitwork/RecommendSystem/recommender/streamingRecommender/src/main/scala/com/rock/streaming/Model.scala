@@ -1,4 +1,4 @@
-package com.rock
+package com.rock.streaming
 
 /**
   * 解释数据：
@@ -78,3 +78,5 @@ case class UserRecs(uid:Int, recs:Seq[Recommendation])
 
 //电影的相似度
 case class MovieRecs(mid:Int, recs:Seq[Recommendation])
+
+case class MongConfig(uri:String,db:String)
